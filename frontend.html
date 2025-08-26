@@ -1,0 +1,136 @@
+<!-- Generated with DeepSeek -->
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест ручки заказа</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 50px;
+        }
+
+        .input-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        #orderId {
+            padding: 10px;
+            width: 100px;
+            background-color: #222;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        .response-time {
+            text-align: right;
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 10px;
+            min-height: 18px;
+        }
+
+        #response {
+            background-color: #222;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="input-section">
+            <input type="number" id="orderId" value="1" min="1">
+            <button onclick="fetchOrder()">Получить заказ</button>
+        </div>
+
+        <div class="response-time" id="responseTime"></div>
+
+        <div id="response">Здесь появится ответ от сервера...</div>
+    </div>
+
+    <script>
+        async function fetchOrder() {
+            const orderId = document.getElementById('orderId').value;
+            const responseElement = document.getElementById('response');
+            const responseTimeElement = document.getElementById('responseTime');
+
+            if (!orderId || orderId < 1) {
+                responseElement.textContent = 'Пожалуйста, введите корректный номер заказа';
+                return;
+            }
+
+            try {
+                responseElement.textContent = 'Загрузка...';
+                responseTimeElement.textContent = '';
+
+                const startTime = performance.now();
+
+                const response = await fetch(`http://localhost:8081/order/${orderId}`);
+
+                const endTime = performance.now();
+                const responseTime = (endTime - startTime).toFixed(2);
+
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                responseTimeElement.textContent = `Время ответа: ${responseTime} мс`;
+                responseElement.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseTimeElement.textContent = '';
+                responseElement.textContent = `Ошибка: ${error.message}`;
+            }
+        }
+
+        document.getElementById('orderId').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                fetchOrder();
+            }
+        });
+    </script>
+</body>
+
+</html>

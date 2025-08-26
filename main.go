@@ -42,10 +42,13 @@ func main() {
 
 	// emulator and consumer
 	go emulator.StartEmulate(envService, emulatorService)
-	go consumer.StartConsume(envService, orderService)
+
+	myConsumer := consumer.NewConsumer(envService, orderService, cacheRepo)
+	go myConsumer.StartConsume()
 
 	// cache update
-	go cacheService.UpdateCacheNewest(10)
+	go cacheService.UpdateCacheNewest(10000)
+
 	// http server
 	mux := http.NewServeMux()
 	orderHandler := handler.NewOrderHandler(orderService, cacheRepo)

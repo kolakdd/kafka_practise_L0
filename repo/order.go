@@ -9,8 +9,8 @@ import (
 
 type OrderRepo interface {
 	SelectOrderById(uid int64) (*models.Order, error)
-	CreateOrderTx(tx *sqlx.Tx, payment models.OrderMessage) (int, error)
-	CreateOrderXItemsTx(tx *sqlx.Tx, order_uid int, items_uid []int) error
+	CreateOrderTx(tx *sqlx.Tx, payment models.OrderMessage) (int64, error)
+	CreateOrderXItemsTx(tx *sqlx.Tx, order_uid int64, items_uid []int) error
 	SelectNewestWithOffset(offset int) (*models.Order, error)
 }
 
@@ -106,8 +106,8 @@ func (r *orderRepo) SelectNewestWithOffset(offset int) (*models.Order, error) {
 
 }
 
-func (r *orderRepo) CreateOrderTx(tx *sqlx.Tx, order models.OrderMessage) (int, error) {
-	var uid int
+func (r *orderRepo) CreateOrderTx(tx *sqlx.Tx, order models.OrderMessage) (int64, error) {
+	var uid int64
 	query := `
 		INSERT INTO public."Order"
 		(customer_id, track_number, entry, delivery, payment, locale, 
@@ -131,7 +131,7 @@ func (r *orderRepo) CreateOrderTx(tx *sqlx.Tx, order models.OrderMessage) (int, 
 	return uid, nil
 }
 
-func (r *orderRepo) CreateOrderXItemsTx(tx *sqlx.Tx, order_uid int, items_uid []int) error {
+func (r *orderRepo) CreateOrderXItemsTx(tx *sqlx.Tx, order_uid int64, items_uid []int) error {
 	for i := 0; i < len(items_uid); i++ {
 		query := `
 		INSERT INTO public."OrderXItems"

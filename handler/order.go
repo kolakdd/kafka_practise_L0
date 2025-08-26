@@ -53,6 +53,7 @@ func (h *orderHandler) GetOrderById(w http.ResponseWriter, r *http.Request) {
 		}
 		_, _ = w.Write(jData)
 		h.cache.Set(uidParsed, jData)
+
 	default:
 		apiError.BackendErrorWrite(w, apiError.MethodNotAllowed)
 	}

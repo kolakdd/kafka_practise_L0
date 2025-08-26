@@ -35,13 +35,11 @@ func (c *cacheService) UpdateCacheNewest(count int) {
 			defer wg.Done()
 			order, err := c.o.SelectNewestWithOffset(offset)
 			if err != nil {
-				log.Println(err)
 				errCounter.Add(1)
 				return
 			}
 			jData, errM := json.Marshal(order)
 			if errM != nil {
-				log.Println(err)
 				errCounter.Add(1)
 				return
 			}
